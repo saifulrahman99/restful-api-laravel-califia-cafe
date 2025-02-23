@@ -12,7 +12,7 @@ class Menu extends Model
 
     protected $keyType = 'string';
     public $incrementing = false;
-    protected $fillable = ['name', 'description', 'image_path', 'price', 'category_id','stock','type'];
+    protected $fillable = ['name', 'description', 'image_path', 'price', 'category_id', 'stock', 'type', 'discount_id'];
 
     protected static function boot()
     {
@@ -25,5 +25,10 @@ class Menu extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function discount()
+    {
+        return $this->belongsTo(Discount::class, 'discount_id');
     }
 }

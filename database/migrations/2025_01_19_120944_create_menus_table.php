@@ -17,11 +17,13 @@ return new class extends Migration {
             $table->string('image_path');
             $table->bigInteger('price');
             $table->uuid('category_id')->nullable(); // Foreign key ke categories
+            $table->uuid('discount_id')->nullable(); // Foreign key ke discount
             $table->enum('type', ['food', 'drink'])->default(null)->nullable();
             $table->integer('stock')->default(0);
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->foreign('discount_id')->references('id')->on('discounts')->onDelete('set null');
         });
     }
 
