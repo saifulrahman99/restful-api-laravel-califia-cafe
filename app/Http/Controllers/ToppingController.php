@@ -34,7 +34,7 @@ class ToppingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Topping $topping)
+    public function show(string $id)
     {
         //
     }
@@ -42,7 +42,7 @@ class ToppingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Topping $topping)
+    public function edit(string $id)
     {
         //
     }

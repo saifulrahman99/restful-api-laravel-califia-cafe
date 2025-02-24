@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CategoryRequest extends FormRequest
+class UpdateCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,15 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => 'required|string|exists:categories,id',
             'name' => 'required|string|max:100|unique:categories,name',
         ];
     }
-
-    /**
-     * Kustomisasi pesan error jika validasi gagal.
-     */
     public function messages(): array
     {
         return [
+            'id.required' => 'Id kategori tidak boleh kosong.',
+            'id.string' => 'Id kategori harus berupa teks.',
             'name.required' => 'Nama kategori wajib diisi.',
             'name.string' => 'Nama kategori harus berupa teks.',
             'name.max' => 'Nama kategori tidak boleh lebih dari 100 karakter.',
