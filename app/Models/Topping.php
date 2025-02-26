@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -34,7 +34,8 @@ class Topping extends Model
 
     protected $keyType = 'string';
     public $incrementing = false;
-    protected $fillable = ['name', 'type', 'price'];
+    protected $fillable = ['name', 'type', 'price', 'stock'];
+
     protected static function boot()
     {
         parent::boot();
@@ -42,7 +43,9 @@ class Topping extends Model
             $model->id = (string)Str::uuid();
         });
     }
-    public  function billDetailsToppings(){
+
+    public function billDetailsToppings()
+    {
         return $this->hasMany(BillDetailTopping::class, 'topping_id');
     }
 }

@@ -2,27 +2,39 @@
 
 namespace App\Http;
 
-use App\Exceptions\Handler;
+use App\Http\Middleware\ForceJsonResponse;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
-use Illuminate\Http\Middleware\TrustHosts;
-use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class Kernel extends HttpKernel
 {
     protected $middleware = [
-        TrustHosts::class,
-        TrustProxies::class,
-        ValidateCsrfToken::class,
-        SubstituteBindings::class,
+        CheckForMaintenanceMode::class,
+        ValidatePostSize::class,
+        ConvertEmptyStringsToNull::class,
     ];
 
     protected $middlewareGroups = [
-        'api' => [
-            ThrottleRequests::class . ':api',
+        'web' => [
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            ShareErrorsFromSession::class,
             SubstituteBindings::class,
         ],
+
+        'api' => [
+            SubstituteBindings::class,
+        ],
+    ];
+
+    protected $routeMiddleware = [
+//        'auth' => \App\Http\Middleware\Authenticate::class,
+        'json' => ForceJsonResponse::class,
     ];
 }

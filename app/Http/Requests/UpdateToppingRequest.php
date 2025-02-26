@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ToppingRequest extends FormRequest
+class UpdateToppingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,12 @@ class ToppingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:100|unique:toppings,name',
-            'type' => 'required|string',
+            'id' => 'required|string|exists:toppings,id',
+            'name' => 'required|string|max:100',
+            'type' => 'required|string|in:food,drink',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+
         ];
     }
 }
