@@ -59,8 +59,7 @@ class ToppingController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $topping = Topping::findOrFail($id);
-        $topping->delete();
+        $topping = Topping::findOrFail($id)->delete();
         return ApiResponse::commonResponse(null, ResponseMessage::DELETED);
     }
 

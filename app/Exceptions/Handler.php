@@ -65,4 +65,20 @@ class Handler extends ExceptionHandler
         }
         return parent::render($request, $e);
     }
+
+    public function register()
+    {
+        $this->reportable(function (Throwable $e) {
+            //
+        });
+    }
+
+    public function report(Throwable $exception)
+    {
+        if ($this->shouldReport($exception)) {
+            \Log::error($exception);
+        }
+
+        parent::report($exception);
+    }
 }
