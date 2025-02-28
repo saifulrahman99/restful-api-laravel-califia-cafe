@@ -8,6 +8,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -15,7 +16,7 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         // Ambil parameter dari request
         $q = $request->query('q', '');
@@ -29,7 +30,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoryRequest $request)
+    public function store(CategoryRequest $request): JsonResponse
     {
         $category = Category::create($request->validated());
         return ApiResponse::commonResponse(new CategoryResource($category), ResponseMessage::CREATED, 201);
@@ -38,7 +39,7 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         $category = Category::findOrFail($id);
         return ApiResponse::commonResponse(new CategoryResource($category));
@@ -47,7 +48,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryRequest $request)
+    public function update(UpdateCategoryRequest $request): JsonResponse
     {
         $category = Category::findOrFail($request->get('id'));
         $category->update($request->validated());
@@ -58,7 +59,7 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $category = Category::findOrFail($id);
         $category->delete();

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -49,6 +49,6 @@ class Discount extends Model
 
     public function menu()
     {
-        return $this->hasOne(Menu::class, 'discount_id');
+        return $this->hasMany(Menu::class, 'discount_id');
     }
 }

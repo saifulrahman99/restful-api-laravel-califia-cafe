@@ -63,6 +63,9 @@ class ToppingController extends Controller
         return ApiResponse::commonResponse(null, ResponseMessage::DELETED);
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function updateStock(Request $request, string $id): JsonResponse
     {
         $request->validate([
@@ -78,11 +81,10 @@ class ToppingController extends Controller
                     'stock' => ['stock tidak boleh kurang dari 0'],
                 ]);
             }
-            $topping->save();
         } else {
             $topping->stock += $request->get('qty');
-            $topping->save();
         }
+        $topping->save();
         return ApiResponse::commonResponse(new ToppingResource($topping), ResponseMessage::UPDATED);
     }
 }

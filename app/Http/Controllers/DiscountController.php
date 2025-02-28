@@ -45,7 +45,7 @@ class DiscountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function updateStatus(string $id)
     {
         $discount = Discount::findOrFail($id);
         $discount->is_active = !$discount->is_active;
