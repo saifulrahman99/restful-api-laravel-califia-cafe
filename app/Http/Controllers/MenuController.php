@@ -11,6 +11,7 @@ use App\Models\Menu;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class MenuController extends Controller
@@ -40,8 +41,9 @@ class MenuController extends Controller
         $data['image_path'] = $imagePath;
 
         $menu = Menu::create($data);
+        $newMenu = Menu::with(['category', 'discount'])->findOrFail($menu->id);
 
-        return ApiResponse::commonResponse(new MenuResource($menu), ResponseMessage::CREATED, 201);
+        return ApiResponse::commonResponse(new MenuResource($newMenu), ResponseMessage::CREATED, 201);
     }
 
     /**
@@ -83,7 +85,7 @@ class MenuController extends Controller
     public function update(UpdateMenuRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $menu = Menu::findOrFail($request->get('id'));
+        $menu = Menu::with(['category', 'discount'])->findOrFail($request->get('id'));
         if ($request->file('image')) {
             $data['image_path'] = $request->file('image')->store('menus', 'public');
         }
@@ -98,7 +100,10 @@ class MenuController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $menu = Menu::findOrFail($id);
-        $menu->delete();
+        if (Storage::disk('public')->exists($menu->image_path)) {
+            Storage::disk('public')->delete($menu->image_path);
+        }
+//        $menu->delete();
         return ApiResponse::commonResponse(null, ResponseMessage::DELETED);
     }
 }
