@@ -3,11 +3,12 @@
 
 namespace App\Exceptions;
 
-use App\Enums\ResponseMessage;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Throwable;
+
+use App\Enums\ResponseMessage;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;

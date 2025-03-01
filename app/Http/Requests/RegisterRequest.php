@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MenuRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -23,13 +23,8 @@ class MenuRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'description' => 'string|nullable',
-            'image' => 'file|mimes:jpeg,jpg,png|required|max:10000',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'type' => 'required|string|in:food,drink',
-            'category_id' => 'required|string|exists:categories,id',
-            'discount_id' => 'nullable|string|exists:discounts,id',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|min:6|confirmed',
         ];
     }
 }
