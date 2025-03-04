@@ -57,4 +57,4 @@ Route::group(['prefix' => 'bills'], function () {
     Route::delete('/{id}', [BillController::class, 'destroy'])->middleware('auth:sanctum');
 });
 
-Route::get('/image/{encryptedUrl}', [ImageController::class, 'show']);
+Route::get('/images/{encryptedUrl}', [ImageController::class, 'show']);

@@ -19,7 +19,7 @@ class BillDetailResource extends JsonResource
             'menu' => $this->menu ? [
                 'id' => $this->menu->id,
                 'name' => $this->menu->name,
-                'image' => url('/api/image/' . $this->menu->encrypted_image_url),
+                'image' => url('/api/images/' . $this->menu->encrypted_image_url),
                 'deleted_at' => $this->menu->deleted_at,
             ] : null,
             'qty' => $this->qty,
