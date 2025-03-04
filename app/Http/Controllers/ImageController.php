@@ -11,7 +11,7 @@ class ImageController extends Controller
     {
         try {
             // Dekripsi URL gambar
-            $decryptedPath = Crypt::decryptString($encryptedUrl);
+            $decryptedPath = base64_decode(strtr($encryptedUrl, '-_', '+/'));
             // Pastikan file ada di storage
             if (!Storage::disk('public')->exists($decryptedPath)) {
                 return response()->json(['error' => 'File not found'], 404);

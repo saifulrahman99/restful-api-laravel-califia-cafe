@@ -71,6 +71,6 @@ class Menu extends Model
 
     public function getEncryptedImageUrlAttribute()
     {
-        return Crypt::encryptString($this->image_path);
+        return rtrim(strtr(base64_encode($this->image_path), '+/', '-_'), '=');
     }
 }
