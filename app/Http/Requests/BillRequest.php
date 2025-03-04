@@ -23,6 +23,7 @@ class BillRequest extends FormRequest
     {
         return [
             'customer_name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:25',
             'table' => 'nullable|string|max:10',
             'bill_details' => 'required|array|min:1', // Minimal ada 1 bill detail
         ];

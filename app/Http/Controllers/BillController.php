@@ -45,6 +45,7 @@ class BillController extends Controller
             ->where(function ($query) use ($q) {
                 $query->where('invoice_no', 'like', "%$q%")
                     ->orWhere('customer_name', 'like', "%$q%")
+                    ->orWhere('phone_number', 'like', "%$q%")
                     ->withTrashed();
             });
 
@@ -72,6 +73,10 @@ class BillController extends Controller
 //
 //    }
 
+//    public function printInvoice(Request $request): JsonResponse{
+//
+//    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -82,6 +87,7 @@ class BillController extends Controller
         try {
             $bill = Bill::create([
                 'customer_name' => $data['customer_name'],
+                'phone_number' => $this->formatPhoneNumber($data['phone_number']),
                 'trans_date' => now(),
                 'invoice_no' => $this->generateInvoiceUUID(),
                 'table' => $data['table'] ?? null,
@@ -202,5 +208,14 @@ class BillController extends Controller
     private function generateInvoiceUUID(): string
     {
         return 'INV-' . strtoupper(Str::random(8));
+    }
+
+    private function formatPhoneNumber($phone): string
+    {
+        // Hilangkan karakter non-numerik
+        $phone = preg_replace('/\D/', '', $phone);
+
+        // Ubah 08 menjadi 62
+        return preg_replace('/^0/', '62', $phone);
     }
 }

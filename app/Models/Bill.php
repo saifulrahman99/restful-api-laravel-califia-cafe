@@ -47,7 +47,7 @@ class Bill extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['customer_name', 'trans_date', 'invoice_no', 'table', 'order_type', 'status', 'final_price'];
+    protected $fillable = ['customer_name', 'trans_date', 'invoice_no', 'table', 'order_type', 'status', 'final_price', 'phone_number'];
 
     protected static function boot()
     {

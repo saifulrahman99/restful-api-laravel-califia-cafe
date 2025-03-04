@@ -17,6 +17,7 @@ class BillResource extends JsonResource
         return [
             'id' => $this->id,
             'customer_name' => $this->customer_name,
+            'phone_number' => $this->phone_number,
             'trans_date' => $this->trans_date,
             'invoice_no' => $this->invoice_no,
             'table' => $this->table,
