@@ -71,11 +71,6 @@ class BillController extends Controller
 //    {
 //
 //    }
-//
-//    public function getRecommendedMenu(): JsonResponse
-//    {
-//
-//    }
 
     /**
      * Store a newly created resource in storage.

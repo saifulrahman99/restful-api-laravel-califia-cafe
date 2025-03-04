@@ -34,6 +34,7 @@ Route::group(['prefix' => 'discounts'], function () {
 });
 Route::group(['prefix' => 'menus'], function () {
     Route::get('/', [MenuController::class, 'index']);
+    Route::get('/recommended', [MenuController::class, 'recommended']);
     Route::post('/', [MenuController::class, 'store'])->middleware('auth:sanctum');
     Route::put('/', [MenuController::class, 'update'])->middleware('auth:sanctum');
     Route::patch('/{id}', [MenuController::class, 'updateStock'])->middleware('auth:sanctum');

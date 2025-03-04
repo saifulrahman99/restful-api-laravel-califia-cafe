@@ -7,10 +7,10 @@ use App\Helpers\ApiResponse;
 use App\Http\Requests\MenuRequest;
 use App\Http\Requests\UpdateMenuRequest;
 use App\Http\Resources\MenuResource;
+use App\Models\Bill;
 use App\Models\Menu;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -27,6 +27,26 @@ class MenuController extends Controller
         $perPage = $request->query('perPage', 10);
         $page = $request->query('page', 1);
         $menus = Menu::with(['category', 'discount'])->where('name', 'like', "%$q%")->orderBy($sortBy, $direction)->paginate($perPage, ['*'], 'page', $page);
+
+        return ApiResponse::commonResponse(MenuResource::collection($menus)->response()->getData(true));
+    }
+
+    public function recommended(): JsonResponse
+    {
+        $totalBills = Bill::count();
+
+        if ($totalBills < 5) {
+            return response()->json([
+                'message' => 'Belum cukup transaksi untuk menampilkan menu terlaris.',
+                'total_bills' => $totalBills
+            ]);
+        }
+
+        $menus = Menu::with('discount') // Ambil data diskon
+        ->withCount('billDetails') // Hitung jumlah pemesanan menu
+        ->orderByDesc('bill_details_count') // Urutkan dari yang paling banyak dipesan
+        ->take(10) // Ambil 10 menu terlaris
+        ->get();
 
         return ApiResponse::commonResponse(MenuResource::collection($menus)->response()->getData(true));
     }

@@ -69,6 +69,11 @@ class Menu extends Model
         return $this->belongsTo(Discount::class, 'discount_id');
     }
 
+    public function billDetails()
+    {
+        return $this->hasMany(BillDetail::class, 'menu_id');
+    }
+
     public function getEncryptedImageUrlAttribute()
     {
         return rtrim(strtr(base64_encode($this->image_path), '+/', '-_'), '=');
