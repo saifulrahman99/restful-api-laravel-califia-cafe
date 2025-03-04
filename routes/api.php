@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::group(['prefix' => 'bills'], function () {
     Route::get('/', [BillController::class, 'index']);
     Route::post('/', [BillController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/', [BillController::class, 'update'])->middleware('auth:sanctum');
     Route::patch('/{id}', [BillController::class, 'updateStatus'])->middleware('auth:sanctum');
     Route::get('/{id}', [BillController::class, 'show'])->middleware('auth:sanctum');
     Route::delete('/{id}', [BillController::class, 'destroy'])->middleware('auth:sanctum');

@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Requests\BillDetailRequest;
 use App\Http\Requests\BillDetailToppingRequest;
 use App\Http\Requests\BillRequest;
+use App\Http\Requests\UpdateBillRequest;
 use App\Http\Resources\BillResource;
 use App\Models\Bill;
 use App\Models\Menu;
@@ -186,6 +187,21 @@ class BillController extends Controller
             'id' => $bill->id,
             'status' => $bill->status,
         ], ResponseMessage::UPDATED);
+    }
+
+    public function update(UpdateBillRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            DB::beginTransaction();
+            $bill = Bill::findOrFail($request->get('id'));
+            $bill->update($data);
+            DB::commit();
+            return ApiResponse::commonResponse(new BillResource($bill), ResponseMessage::UPDATED);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**
