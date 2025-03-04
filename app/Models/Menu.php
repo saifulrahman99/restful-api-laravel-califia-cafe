@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -40,11 +42,14 @@ use Illuminate\Support\Str;
  */
 class Menu extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $keyType = 'string';
     public $incrementing = false;
     protected $fillable = ['name', 'description', 'image_path', 'price', 'category_id', 'stock', 'type', 'discount_id'];
+
+    protected $appends = ['encrypted_image_url'];
+    protected $dates = ['deleted_at'];
 
     protected static function boot()
     {
@@ -62,5 +67,10 @@ class Menu extends Model
     public function discount()
     {
         return $this->belongsTo(Discount::class, 'discount_id');
+    }
+
+    public function getEncryptedImageUrlAttribute()
+    {
+        return Crypt::encryptString($this->image_path);
     }
 }

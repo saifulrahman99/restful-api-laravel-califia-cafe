@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ResponseMessage;
+use App\Helpers\ApiResponse;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
@@ -52,12 +53,12 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Logged out']);
+        return ApiResponse::commonResponse(null, 'Logged out successfully.');
     }
 
     // GET USER DATA
     public function me(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        return ApiResponse::commonResponse($request->user());
     }
 }

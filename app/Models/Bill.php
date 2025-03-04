@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $invoice_no
@@ -47,7 +47,7 @@ class Bill extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['customer_name', 'trans_date', 'invoice_no', 'table', 'order_type', 'status'];
+    protected $fillable = ['customer_name', 'trans_date', 'invoice_no', 'table', 'order_type', 'status', 'final_price'];
 
     protected static function boot()
     {
@@ -60,7 +60,8 @@ class Bill extends Model
         });
     }
 
-    public function billDetails(){
+    public function billDetails()
+    {
         return $this->hasMany(BillDetail::class, 'bill_id');
     }
 }

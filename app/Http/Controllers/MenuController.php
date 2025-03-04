@@ -103,7 +103,7 @@ class MenuController extends Controller
         if (Storage::disk('public')->exists($menu->image_path)) {
             Storage::disk('public')->delete($menu->image_path);
         }
-//        $menu->delete();
+        $menu->delete();
         return ApiResponse::commonResponse(null, ResponseMessage::DELETED);
     }
 }

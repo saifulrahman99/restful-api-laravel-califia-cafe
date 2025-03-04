@@ -22,7 +22,10 @@ class BillDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'menu_id' => 'required|string|exists:menus,id',
+            'qty' => 'required|integer|min:1',
+            'note' => 'nullable|string|max:255',
+            'bill_detail_toppings' => 'nullable|array',
         ];
     }
 }

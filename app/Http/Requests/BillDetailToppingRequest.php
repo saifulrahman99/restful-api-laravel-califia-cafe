@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BillRequest extends FormRequest
+class BillDetailToppingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return false;
     }
 
     /**
@@ -22,9 +22,8 @@ class BillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_name' => 'required|string|max:255',
-            'table' => 'nullable|string|max:10',
-            'bill_details' => 'required|array|min:1', // Minimal ada 1 bill detail
+            'topping_id' => 'required|exists:toppings,id',
+            'qty' => 'required|integer|min:1',
         ];
     }
 }

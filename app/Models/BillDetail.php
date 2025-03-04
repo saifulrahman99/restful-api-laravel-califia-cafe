@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $bill_id
@@ -42,7 +42,7 @@ class BillDetail extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['bill_id', 'menu_id', 'qty', 'price', 'note'];
+    protected $fillable = ['bill_id', 'menu_id', 'qty', 'price', 'discount_price', 'note'];
 
     protected static function boot()
     {
@@ -55,12 +55,14 @@ class BillDetail extends Model
         });
     }
 
-    public function bill(){
+    public function bill()
+    {
         return $this->belongsTo(Bill::class, 'bill_id');
     }
 
-    public function menu(){
-        return $this->belongsTo(Menu::class, 'menu_id');
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_id')->withTrashed();
     }
 
     public function billDetailToppings()
