@@ -22,11 +22,23 @@ class MenuController extends Controller
     public function index(Request $request): JsonResponse
     {
         $q = $request->query('q', '');
+        $type = $request->input('type', '');
+        $category = $request->input('category', '');
         $direction = $request->query('direction', 'asc');
         $sortBy = $request->query('sortBy', 'name');
         $perPage = $request->query('perPage', 10);
         $page = $request->query('page', 1);
-        $menus = Menu::with(['category', 'discount'])->where('name', 'like', "%$q%")->orderBy($sortBy, $direction)->paginate($perPage, ['*'], 'page', $page);
+        $menus = Menu::with(['category', 'discount'])
+            ->whereHas('category', function ($query) use ($category) {
+                if (!empty($category)) {
+                    $query->where('name', $category);
+                }
+            })
+            ->where('name', 'like', "%$q%")
+            ->where('type', 'like', "%$type%")
+            ->orderBy($sortBy, $direction)
+            ->paginate($perPage, ['*'], 'page', $page);
+
 
         return ApiResponse::commonResponse(MenuResource::collection($menus)->response()->getData(true));
     }
