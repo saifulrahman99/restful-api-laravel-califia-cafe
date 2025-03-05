@@ -9,6 +9,7 @@ class ApiResponse
     public static function commonResponse($data = null, ResponseMessage $message = ResponseMessage::SUCCESS, $status = 200)
     {
         return response()->json([
+            'status' => $status,
             'message' => $message->message(),
             'data' => $data,
         ], $status);

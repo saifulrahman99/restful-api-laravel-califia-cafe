@@ -156,10 +156,14 @@ class BillController extends Controller
             return ApiResponse::commonResponse(new BillResource($bill), ResponseMessage::CREATED, 201);
         } catch (ValidationException $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json([
+                'status' => 422,
+                'message' => $e->getMessage()], 422);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()], 500);
         }
     }
 
@@ -200,7 +204,9 @@ class BillController extends Controller
             return ApiResponse::commonResponse(new BillResource($bill), ResponseMessage::UPDATED);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()], 500);
         }
     }
 
@@ -216,7 +222,9 @@ class BillController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()], 500);
         }
         return ApiResponse::commonResponse(null, ResponseMessage::DELETED);
     }

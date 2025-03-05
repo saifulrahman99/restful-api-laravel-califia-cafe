@@ -14,13 +14,17 @@ class ImageController extends Controller
             $decryptedPath = base64_decode(strtr($encryptedUrl, '-_', '+/'));
             // Pastikan file ada di storage
             if (!Storage::disk('public')->exists($decryptedPath)) {
-                return response()->json(['error' => 'File not found'], 404);
+                return response()->json([
+                    'status' => 400,
+                    'error' => 'File not found'], 404);
             }
 
             // Tampilkan gambar
             return response()->file(storage_path('app/public/' . $decryptedPath));
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid Image URL'], 400);
+            return response()->json([
+                'status' => 400,
+                'error' => 'Invalid Image URL'], 400);
         }
     }
 }

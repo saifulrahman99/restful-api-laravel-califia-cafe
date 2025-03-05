@@ -1,85 +1,65 @@
 <?php
-
-
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-
-use App\Enums\ResponseMessage;
-use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
-    public function render($request, Throwable $e): JsonResponse|Response
+    public function render($request, Throwable $exception)
     {
+        $statusCode = 500;
+        $message = 'Terjadi kesalahan pada server';
+        $data = null;
+
+        // Pastikan API mengembalikan response JSON
         if ($request->expectsJson()) {
-            if ($e instanceof ValidationException) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => ResponseMessage::VALIDATION_ERROR,
-                    'errors' => $e->errors()
-                ], 422);
+            // Menangani validasi
+            if ($exception instanceof ValidationException) {
+                $statusCode = 422;
+                $message = 'Validasi gagal';
+                $data = $exception->errors();
             }
 
-            if ($e instanceof ModelNotFoundException) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => ResponseMessage::NOT_FOUND
-                ], 404);
+            // Menangani authentication error
+            if ($exception instanceof AuthenticationException) {
+                $statusCode = 401;
+                $message = 'Anda belum login atau token tidak valid';
             }
 
-            if ($e instanceof NotFoundHttpException) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => ResponseMessage::NOT_FOUND
-                ], 404);
+            // Menangani ModelNotFoundException (query gagal menemukan data)
+            if ($exception instanceof ModelNotFoundException) {
+                $statusCode = 404;
+                $message = 'Data tidak ditemukan';
+
+                // Cek jika pesan error mengandung "No query results for model"
+                if (str_contains($exception->getMessage(), 'No query results for model')) {
+                    $message = 'Data yang Anda cari tidak ditemukan';
+                }
             }
 
-            if ($e instanceof MethodNotAllowedHttpException) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => ResponseMessage::FORBIDDEN
-                ], 405);
-            }
+            // Menangani HttpException (termasuk 404 dari routing API)
+            if ($exception instanceof HttpException) {
+                $statusCode = $exception->getStatusCode();
+                $message = $exception->getMessage() ?: 'Halaman tidak ditemukan';
 
-            if ($e instanceof AuthenticationException) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => ResponseMessage::UNAUTHORIZED
-                ], 401);
+                if ($statusCode === 404) {
+                    $message = 'Endpoint API tidak ditemukan';
+                }
             }
-            Log::error($e->getMessage(), ['exception' => $e]);
 
             return response()->json([
-                'status' => 'error',
-                'message' => ResponseMessage::SERVER_ERROR,
-                'error_detail' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
-        }
-        return parent::render($request, $e);
-    }
-
-    public function register()
-    {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
-    }
-
-    public function report(Throwable $exception)
-    {
-        if ($this->shouldReport($exception)) {
-            Log::error($exception);
+                'status' => $statusCode,
+                'message' => $message,
+                'data' => $data
+            ], $statusCode);
         }
 
-        parent::report($exception);
+        // Jika bukan API, gunakan default handler
+        return parent::render($request, $exception);
     }
 }

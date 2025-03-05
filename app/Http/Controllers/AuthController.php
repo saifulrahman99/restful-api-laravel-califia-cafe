@@ -25,7 +25,9 @@ class AuthController extends Controller
 
         $token = $user->createToken('browser')->plainTextToken;
 
-        return response()->json(['token' => $token, 'user' => $user], 201);
+        return response()->json([
+            'status' => 201,
+            'token' => $token, 'user' => $user], 201);
     }
 
     // LOGIN
@@ -45,7 +47,9 @@ class AuthController extends Controller
         $user->tokens()->delete();
         $token = $user->createToken('browser')->plainTextToken;
 
-        return response()->json(['message' => ResponseMessage::SUCCESS, 'token' => $token, 'user' => $user]);
+        return response()->json([
+            'status' => 200,
+            'message' => ResponseMessage::SUCCESS, 'token' => $token, 'user' => $user]);
     }
 
     // LOGOUT
@@ -53,7 +57,7 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return ApiResponse::commonResponse(null, 'Logged out successfully.');
+        return ApiResponse::commonResponse(['status' => 200], 'Logged out successfully.');
     }
 
     // GET USER DATA
