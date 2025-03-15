@@ -7,14 +7,15 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-        // Tambahkan tugas terjadwal di sini
+        $schedule->command('discounts:expire')->hourly();
+        $schedule->command('tokens:expire')->daily();
     }
 
-    protected function commands()
+    protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
 }

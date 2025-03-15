@@ -45,7 +45,7 @@ class AuthController extends Controller
             ]);
         }
         $user->tokens()->delete();
-        $token = $user->createToken('browser')->plainTextToken;
+        $token = $user->createToken('browser', ['*'], now()->addDays(7))->plainTextToken;
 
         return response()->json([
             'status' => 200,

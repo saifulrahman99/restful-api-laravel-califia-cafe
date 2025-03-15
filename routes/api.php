@@ -41,12 +41,13 @@ Route::group(['prefix' => 'menus'], function () {
     Route::get('/{id}', [MenuController::class, 'show']);
     Route::delete('/{id}', [MenuController::class, 'destroy'])->middleware('auth:sanctum');
 });
+
+Route::post("/auth/login", [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
-        Route::post('/login', [AuthController::class, 'login']);
     });
 });
 

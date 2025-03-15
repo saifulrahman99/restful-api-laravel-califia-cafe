@@ -107,7 +107,7 @@ class BillController extends Controller
                 $menu = Menu::with('discount')->findOrFail($detail['menu_id']);
                 if ($menu->stock < $detail['qty']) {
                     throw ValidationException::withMessages([
-                        'stock' => ['Stock tidak boleh kurang dari 0'],
+                        'stock' => ['Stock tidak cukup'],
                     ]);
                 }
                 $menu->decrement('stock', $detail['qty']); // kurangi stok
@@ -133,6 +133,13 @@ class BillController extends Controller
                             return response()->json(['errors' => $validator->errors()], 422);
                         }
                         $topping = Topping::findOrFail($detailTopping['topping_id']);
+
+                        if ($topping->stock < $detailTopping['qty']) {
+                            throw ValidationException::withMessages([
+                                'stock' => ['Stock tidak cukup'],
+                            ]);
+                        }
+                        $topping->decrement('stock', $detailTopping['qty']);
 
                         $toppingTotal = $topping->price * $detailTopping['qty']; // Hitung harga topping
 

@@ -27,7 +27,7 @@ class MenuRequest extends FormRequest
             'image' => 'file|mimes:jpeg,jpg,png|required|max:10000',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'type' => 'required|string|in:food,drink',
+            'type' => 'required|string|in:food,beverage,snack',
             'category_id' => 'required|string|exists:categories,id',
             'discount_id' => 'nullable|string|exists:discounts,id',
         ];
