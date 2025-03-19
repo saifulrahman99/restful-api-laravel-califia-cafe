@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
-Artisan::command('discounts:expire', function () {
-})->hourly();
-Artisan::command('tokens:expire', function () {
+Artisan::command(\App\Console\Commands\ExpireDiscounts::class, function () {
+})->everyMinute();
+Artisan::command(\App\Console\Commands\ExpireTokens::class, function () {
 })->daily();

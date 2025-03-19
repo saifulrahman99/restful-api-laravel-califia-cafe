@@ -28,6 +28,7 @@ class MenuRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'type' => 'required|string|in:food,beverage,snack',
+            'topping_enabled' => 'required|boolean',
             'category_id' => 'required|string|exists:categories,id',
             'discount_id' => 'nullable|string|exists:discounts,id',
         ];

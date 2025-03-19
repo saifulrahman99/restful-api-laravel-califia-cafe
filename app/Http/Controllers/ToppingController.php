@@ -21,8 +21,9 @@ class ToppingController extends Controller
     public function index(Request $request): JsonResponse
     {
         $direction = $request->query('direction', 'asc');
+        $type = $request->query('type', '');
 
-        $topping = Topping::orderBy('name', $direction)->get();
+        $topping = Topping::where('type', 'like', "%$type%")->orderBy('name', $direction)->get();
         return ApiResponse::commonResponse(ToppingResource::collection($topping));
     }
 

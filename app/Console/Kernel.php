@@ -9,8 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('discounts:expire')->hourly();
-        $schedule->command('tokens:expire')->daily();
+
     }
 
     protected function commands(): void

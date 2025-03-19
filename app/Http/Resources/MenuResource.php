@@ -22,6 +22,7 @@ class MenuResource extends JsonResource
             'stock' => $this->stock,
             'image' => url('/api/images/' . $this->encrypted_image_url),
             'type' => $this->type,
+            'topping_enabled' => $this->topping_enabled,
             'category' => new CategoryResource($this->whenLoaded('category')),
             'discount' => new DiscountResource($this->whenLoaded('discount'))
         ];

@@ -28,7 +28,7 @@ class ExpireDiscounts extends Command
     public function handle(): void
     {
         // Update menu yang memiliki discount_id yang sudah expired
-        $affectedRows = DB::table('menus')
+        DB::table('menus')
             ->whereIn('discount_id', function ($query) {
                 $query->select('id')
                     ->from('discounts')
@@ -36,8 +36,9 @@ class ExpireDiscounts extends Command
             })
             ->update(['discount_id' => null]);
 
-        Log::info("✅ Expired discounts removed: {$affectedRows} menus updated.");
-
-        $this->info("✅ Expired discounts removed: {$affectedRows} menus updated.");
+        // matikan diskon
+        DB::table('discounts')
+            ->where('end_date', '<', now())
+            ->update(['active' => 0]);
     }
 }
