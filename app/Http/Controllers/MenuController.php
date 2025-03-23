@@ -28,7 +28,7 @@ class MenuController extends Controller
         $sortBy = $request->query('sortBy', 'name');
         $perPage = $request->query('perPage', 10);
         $page = $request->query('page', 1);
-        $menus = Menu::with(['category', 'discount'])
+        $menusQuery = Menu::with(['category', 'discount'])
             ->whereHas('category', function ($query) use ($category) {
                 if (!empty($category)) {
                     $query->where('name', $category);
@@ -36,9 +36,13 @@ class MenuController extends Controller
             })
             ->where('name', 'like', "%$q%")
             ->where('type', 'like', "%$type%")
-            ->orderBy($sortBy, $direction)
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->orderBy($sortBy, $direction);
 
+        if ($request->has('all') && $request->query('all') === 'true') {
+            $menus = $menusQuery->get(); // Ambil semua data tanpa paging
+        } else {
+            $menus = $menusQuery->paginate($perPage, ['*'], 'page', $page);
+        }
 
         return ApiResponse::commonResponse(MenuResource::collection($menus)->response()->getData(true));
     }
