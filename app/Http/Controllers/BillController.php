@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ResponseMessage;
+use App\Events\PaymentStatusUpdated;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\BillDetailRequest;
 use App\Http\Requests\BillDetailToppingRequest;
@@ -194,6 +195,9 @@ class BillController extends Controller
 
         $bill = Bill::findOrFail($id);
         $bill->update(['status' => $request->get('status')]);
+
+        broadcast(new PaymentStatusUpdated($bill))->toOthers();
+
         return ApiResponse::commonResponse([
             'id' => $bill->id,
             'status' => $bill->status,
