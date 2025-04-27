@@ -53,6 +53,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::group(['prefix' => 'bills'], function () {
     Route::get('/', [BillController::class, 'index']);
+    Route::get('/recent', [BillController::class, 'recentOrders']);
+    Route::post('/invoices', [BillController::class, 'getBillWhereInIDs']);
     Route::post('/', [BillController::class, 'store']);
     Route::get('/{id}', [BillController::class, 'show']);
     Route::put('/', [BillController::class, 'update'])->middleware('auth:sanctum');

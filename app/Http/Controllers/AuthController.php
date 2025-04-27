@@ -25,9 +25,10 @@ class AuthController extends Controller
 
         $token = $user->createToken('browser')->plainTextToken;
 
-        return response()->json([
-            'status' => 201,
-            'token' => $token, 'user' => $user], 201);
+        return ApiResponse::commonResponse([
+            'token' => $token,
+            'user' => $user
+        ], ResponseMessage::SUCCESS, 201);
     }
 
     // LOGIN
@@ -47,9 +48,10 @@ class AuthController extends Controller
         $user->tokens()->delete();
         $token = $user->createToken('browser', ['*'], now()->addDays(7))->plainTextToken;
 
-        return response()->json([
-            'status' => 200,
-            'message' => ResponseMessage::SUCCESS, 'token' => $token, 'user' => $user]);
+        return ApiResponse::commonResponse([
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
     // LOGOUT

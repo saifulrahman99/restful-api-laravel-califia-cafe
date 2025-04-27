@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ResponseMessage;
+use App\Events\NewOrderEvent;
 use App\Events\PaymentStatusUpdated;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\BillDetailRequest;
 use App\Http\Requests\BillDetailToppingRequest;
 use App\Http\Requests\BillRequest;
+use App\Http\Requests\BillWhereIDs;
 use App\Http\Requests\UpdateBillRequest;
 use App\Http\Resources\BillResource;
 use App\Models\Bill;
@@ -31,12 +33,16 @@ class BillController extends Controller
     public function index(Request $request): JsonResponse
     {
         $q = $request->query('q', '');
-        $start_date = $request->query('start_date');
-        $end_date = $request->query('end_date');
+        $startDate = $request->query('startDate');
+        $endDate = $request->query('endDate');
         $direction = $request->query('direction', 'desc');
         $sortBy = $request->query('sortBy', 'trans_date');
         $perPage = $request->query('perPage', 10);
         $page = $request->query('page', 1);
+        $status = $request->query('status');
+        $notInclude = $request->get('notInclude');
+        $withTrashed = $request->get('withTrashed', false);
+        $paging = $request->query('paging', true);
 
         $allowedSortColumns = ['trans_date', 'invoice_no', 'customer_name', 'final_price'];
         if (!in_array($sortBy, $allowedSortColumns)) {
@@ -44,30 +50,63 @@ class BillController extends Controller
         }
 
         $bill = Bill::with(['billDetails.billDetailToppings'])
-            ->where(function ($query) use ($q) {
+            ->where(function ($query) use ($q, $withTrashed) {
                 $query->where('invoice_no', 'like', "%$q%")
                     ->orWhere('customer_name', 'like', "%$q%")
-                    ->orWhere('phone_number', 'like', "%$q%")
-                    ->withTrashed();
+                    ->orWhere('phone_number', 'like', "%$q%");
+                if ($withTrashed) {
+                    $query->withTrashed();
+                }
             });
 
         // Filter by date range (jika tersedia)
-        if (!empty($start_date) && !empty($end_date)) {
+        if (!empty($startDate) && !empty($endDate)) {
             try {
                 $bill->whereBetween('trans_date', [
-                    Carbon::parse($start_date)->startOfDay(),
-                    Carbon::parse($end_date)->endOfDay()
+                    Carbon::parse($startDate)->startOfDay(),
+                    Carbon::parse($endDate)->endOfDay()
                 ]);
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Format tanggal tidak valid'], 400);
             }
         }
 
-        // Sorting dan pagination
-        $bill = $bill->orderBy($sortBy, $direction)
-            ->paginate($perPage, ['*'], 'page', $page);
+        if (!empty($notInclude) && empty($status)) {
+            $bill->whereNot('status', $notInclude);
+        }
 
+        if (!empty($status)) {
+            $bill->where('status', $status);
+        }
+
+        if ($paging) {
+            // Sorting dan pagination
+            $bill = $bill->orderBy($sortBy, $direction)
+                ->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $bill = $bill->orderBy($sortBy, $direction)->get();
+        }
         return ApiResponse::commonResponse(BillResource::collection($bill)->response()->getData(true));
+    }
+
+    public function recentOrders(Request $request): JsonResponse
+    {
+        $sortBy = 'trans_date';
+        $direction = 'desc';
+
+        $bill = Bill::with(['billDetails.billDetailToppings'])
+            ->whereIn('status', ['pending', 'confirm'])
+            ->orderBy($sortBy, $direction)
+            ->get();
+
+        return ApiResponse::commonResponse(BillResource::collection($bill));
+    }
+
+    public function getBillWhereInIDs(BillWhereIDs $request): JsonResponse
+    {
+        $ids = $request->get("ids");
+        $billsQuery = Bill::with(['billDetails.billDetailToppings'])->whereIn("id", $ids)->orderBy("trans_date", "desc");
+        return ApiResponse::commonResponse(BillResource::collection($billsQuery->get())->response()->getData(true));
     }
 
 //    public function exportBill(Request $request): JsonResponse
@@ -161,6 +200,8 @@ class BillController extends Controller
             $bill->update(['final_price' => $finalPrice]);
 
             DB::commit();
+            broadcast(new NewOrderEvent($bill))->toOthers();
+
             return ApiResponse::commonResponse(new BillResource($bill), ResponseMessage::CREATED, 201);
         } catch (ValidationException $e) {
             DB::rollBack();
@@ -193,15 +234,44 @@ class BillController extends Controller
             'status' => 'required|in:pending,confirm,canceled,paid',
         ]);
 
-        $bill = Bill::findOrFail($id);
-        $bill->update(['status' => $request->get('status')]);
+        $bill = Bill::with('billDetails.menu', 'billDetails.billDetailToppings')->findOrFail($id);
 
-        broadcast(new PaymentStatusUpdated($bill))->toOthers();
+        try {
+            DB::transaction(function () use ($request, $bill) {
+                if ($request->get('status') === 'canceled') {
+                    foreach ($bill->billDetails as $billDetail) {
+                        // Cari Menu asli dari ID
+                        $menu = Menu::find($billDetail->menu->id ?? null);
+                        if ($menu) {
+                            $menu->increment('stock', $billDetail->qty);
+                        }
 
-        return ApiResponse::commonResponse([
-            'id' => $bill->id,
-            'status' => $bill->status,
-        ], ResponseMessage::UPDATED);
+                        // Kembalikan stok topping kalau ada
+                        foreach ($billDetail->billDetailToppings as $billDetailTopping) {
+                            $topping = Topping::find($billDetailTopping->topping_id ?? null);
+                            if ($topping) {
+                                $topping->increment('stock', $billDetail->qty);
+                            }
+                        }
+                    }
+                }
+
+                $bill->update(['status' => $request->get('status')]);
+            });
+
+            broadcast(new PaymentStatusUpdated($bill));
+
+            return ApiResponse::commonResponse([
+                'id' => $bill->id,
+                'status' => $bill->status,
+            ], ResponseMessage::UPDATED);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update bill status',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function update(UpdateBillRequest $request): JsonResponse
