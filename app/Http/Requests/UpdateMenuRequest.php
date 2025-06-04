@@ -25,7 +25,7 @@ class UpdateMenuRequest extends FormRequest
             'id' => 'required|string|exists:menus,id',
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|file|mimes:jpeg,jpg,png|max:10000',
+            'image' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'type' => 'required|string|in:food,beverage,snack',

@@ -39,6 +39,6 @@ class ExpireDiscounts extends Command
         // matikan diskon
         DB::table('discounts')
             ->where('end_date', '<', now())
-            ->update(['active' => 0]);
+            ->update(['is_active' => 0]);
     }
 }

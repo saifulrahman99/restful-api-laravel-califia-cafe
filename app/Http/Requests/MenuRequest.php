@@ -24,7 +24,7 @@ class MenuRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'string|nullable',
-            'image' => 'file|mimes:jpeg,jpg,png|required|max:10000',
+            'image' => 'file|mimes:jpeg,jpg,png|required|max:2000',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'type' => 'required|string|in:food,beverage,snack',

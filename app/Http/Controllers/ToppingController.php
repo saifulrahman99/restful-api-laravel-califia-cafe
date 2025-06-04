@@ -22,8 +22,11 @@ class ToppingController extends Controller
     {
         $direction = $request->query('direction', 'asc');
         $type = $request->query('type', '');
+        $q = $request->query('q', '');
 
-        $topping = Topping::where('type', 'like', "%$type%")->orderBy('name', $direction)->get();
+        $topping = Topping::where('type', 'like', "%$type%")
+            ->where('name', 'like', "%$q%")
+            ->orderBy('name', $direction)->get();
         return ApiResponse::commonResponse(ToppingResource::collection($topping));
     }
 

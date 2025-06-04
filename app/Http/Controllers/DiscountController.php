@@ -8,7 +8,9 @@ use App\Http\Requests\DiscountRequest;
 use App\Http\Requests\UpdateDiscountRequest;
 use App\Http\Resources\DiscountResource;
 use App\Models\Discount;
+use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DiscountController extends Controller
 {
@@ -45,9 +47,17 @@ class DiscountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function updateStatus(string $id)
+    public function updateStatus($id)
     {
         $discount = Discount::findOrFail($id);
+
+        if (now()->greaterThan($discount->end_date)) {
+            return ApiResponse::commonResponse(null, "Tanggal diskon sudah lewat", 422);
+        }
+        if (!$discount->is_active) {
+            Menu::where('discount_id', $discount->id)->update(['discount_id' => null]);
+        }
+
         $discount->is_active = !$discount->is_active;
         $discount->save();
         return ApiResponse::commonResponse(new DiscountResource($discount), ResponseMessage::UPDATED);
