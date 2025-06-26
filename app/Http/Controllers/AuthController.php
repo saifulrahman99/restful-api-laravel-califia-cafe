@@ -8,9 +8,11 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -66,5 +68,26 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return ApiResponse::commonResponse($request->user());
+    }
+
+    public function checkToken(Request $request): JsonResponse
+    {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return ApiResponse::commonResponse(null, "Token Tidak Ditemukan", 401);
+        }
+
+        $accessToken = PersonalAccessToken::findToken($token);
+
+        if (!$accessToken) {
+            return ApiResponse::commonResponse(null, "Token Tidak Valid", 401);
+        }
+
+        if ($accessToken->expires_at && Carbon::now()->greaterThan($accessToken->expires_at)) {
+            return ApiResponse::commonResponse(null, "Token sudah kedaluwarsa", 401);
+        }
+
+        return ApiResponse::commonResponse(null, "token valid");
     }
 }
